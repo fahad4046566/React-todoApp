@@ -7,7 +7,7 @@ function App() {
   
   const [todo, setTodo] = useState("");
   const [todos, setTodos] = useState([]);
-  const [showfinished, setshowfinished] = useState(true)
+  const [showfinished, setshowfinished] = useState(true);
 
   useEffect(() => {
     const todoString = localStorage.getItem("todos");
@@ -21,15 +21,14 @@ function App() {
     localStorage.setItem("todos", JSON.stringify(todoToSave));
   };
 
-  const toggleFinished=() => {
-    setshowfinished(!showfinished)
-  }
+  const toggleFinished = () => {
+    setshowfinished(!showfinished);
+  };
   
 
   const handleAdd = () => {
     const newTodos = [...todos, { id: uuidv4(), todo, isCompleted: false }];
     setTodos(newTodos);
-
     setTodo("");
     saveToLS(newTodos);
   };
@@ -42,7 +41,7 @@ function App() {
       return item.id !== id;
     });
     setTodos(newTodos);
-    saveToLS();
+    saveToLS(newTodos);
   };
 
   const handleDelete = (e, id) => {
@@ -70,75 +69,90 @@ function App() {
 
   return (
     <>
-      <div className="container my-5 p-5 bg-violet-50 min-h-screen rounded-xl mx-auto border border-violet-200 shadow-sm max-w-2xl">
+      <div className="container my-5 p-5 bg-white dark:bg-gray-900 min-h-screen rounded-xl mx-auto border border-violet-200 dark:border-gray-700 shadow-sm max-w-2xl">
         <div className="addTodo mb-8">
-          <h2 className="text-xl font-semibold text-violet-800 mb-3">
+          <h2 className="text-xl font-semibold text-violet-800 dark:text-violet-300 mb-3">
             Add a Todo
           </h2>
-          <div className="flex gap-2">
-            {/* Input field – value state se control, change pe handler call */}
+          <div className="flex gap-2 mb-4">
             <input
               onChange={handleChange}
               value={todo}
               type="text"
-              className="bg-white border border-violet-300 rounded-lg px-4 py-3 grow focus:outline-none focus:ring-2 focus:ring-violet-4..."
+              className="bg-white dark:bg-gray-800 border border-violet-300 dark:border-gray-600 rounded-lg px-4 py-3 grow focus:outline-none focus:ring-2 focus:ring-violet-400 dark:focus:ring-violet-500 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              placeholder="Enter your todo..."
             />
-            {/* Add button – click pe handleAdd call hoga */}
             <button
-            disabled={todo.length<3}
+              disabled={todo.length < 3}
               onClick={handleAdd}
-              className="btn btn-outline btn-success h-12"
+              className={`btn h-12 px-6 ${todo.length < 3 ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 text-white'}`}
             >
               Save
             </button>
           </div>
-          <input onChange={toggleFinished} type="checkbox" checked={showfinished } /> Show Finished
+          
+          <div className="flex items-center">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input 
+                onChange={toggleFinished} 
+                type="checkbox" 
+                checked={showfinished}
+                className="h-5 w-5 text-violet-600 dark:text-violet-400 rounded"
+              />
+              <span className="text-gray-700 dark:text-gray-300 font-medium">Show Finished</span>
+            </label>
+          </div>
         </div>
 
-        <h1 className="text-xl font-bold">Your Todos</h1>
+        <h1 className="text-2xl font-bold text-violet-900 dark:text-violet-200 mb-6">Your Todos</h1>
 
         <div className="todos">
-          {todos.length === 0 && <div className="m-5">No todos to display</div>}
-          {/* Todos array ko map kar ke har todo ke liye card bana rahe hain */}
-          {todos.map((item, index) => ((showfinished || !item.isCompleted) && <div
-              key={index}
-              className="flex items-center justify-between bg-white p-4 my-2 rounded-lg shadow"
-            >
-              <div className="flex gap-5 ">
-                <input
-                  onChange={handleCheckbox}
-                  type="checkbox"
-                  checked={item.isComplited}
-                  name={item.id}
-                  id=""
-                />
-                {/* Todo text – agar completed ho to line-through lagegi */}
-                <div
-                  className={
-                    item.isCompleted
-                      ? "line-through text-gray-500"
-                      : "text-gray-700"
-                  }
-                >
-                  {item.todo}
+          {todos.length === 0 && (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              No todos to display
+            </div>
+          )}
+          
+          {todos.map((item, index) => (
+            (showfinished || !item.isCompleted) && (
+              <div
+                key={item.id}
+                className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 my-3 rounded-xl shadow border border-gray-100 dark:border-gray-700"
+              >
+                <div className="flex items-center space-x-4 flex-1">
+                  <input
+                    onChange={handleCheckbox}
+                    type="checkbox"
+                    checked={item.isCompleted}
+                    name={item.id}
+                    className="h-5 w-5 text-violet-600 dark:text-violet-400 rounded"
+                  />
+                  <div
+                    className={
+                      item.isCompleted
+                        ? "line-through text-gray-500 dark:text-gray-400 text-lg"
+                        : "text-gray-800 dark:text-gray-200 text-lg"
+                    }
+                  >
+                    {item.todo}
+                  </div>
+                </div>
+                <div className="buttons flex gap-2">
+                  <button
+                    onClick={(e) => handleEdit(e, item.id)}
+                    className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={(e) => handleDelete(e, item.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-pointer"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-              {/* Buttons – edit aur delete ke liye */}
-              <div className="buttons flex gap-2">
-                <button
-                  onClick={(e) => handleEdit(e, item.id)} // index pass kar rahe hain edit ke liye
-                  className="btn bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded text-sm"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={(e) => handleDelete(e, item.id)} // index pass kar ke delete karenge
-                  className="btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+            )
           ))}
         </div>
       </div>
